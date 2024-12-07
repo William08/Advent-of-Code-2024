@@ -31,17 +31,12 @@ public class day5 {
             List<Integer> pagesCopy = new ArrayList<>(pages);
 
             pages.sort(new Comparator<Integer>() {
-
                 @Override
                 public int compare(Integer o1, Integer o2) {
-                    //if (!rules.containsKey(o1) || !rules.containsKey(o2)) return 0;
-                    //List<Integer> valueSet1 = rules.get(o1);
-                    //List<Integer> valueSet2 = rules.get(o2);
                     if (rules.containsKey(o1) && rules.get(o1).contains(o2)) return -1;
                     if (rules.containsKey(o2) && rules.get(o2).contains(o1)) return 1;
                     else return 0;
                 }
-
             });
 
             if (pages.stream().anyMatch(x -> x != pagesCopy.get(pages.indexOf(x)))){
