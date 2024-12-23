@@ -1,14 +1,9 @@
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class day11 {
 
@@ -25,7 +20,7 @@ public class day11 {
             }
             scanner.close();
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
 
         String inputString = sb.toString();
@@ -36,7 +31,7 @@ public class day11 {
 
         long time = System.currentTimeMillis();
 
-        //PART 1
+        //First solution
         
         for (Long stone : stones) {
             List<Long> test = List.of(stone);
@@ -46,17 +41,16 @@ public class day11 {
             sum += test.size();
             
         }
-        System.out.println(sum + "   |   Time: " + (System.currentTimeMillis() - time));
+        System.out.println(sum + "   |   Time: " + (System.currentTimeMillis() - time) + "ms");
         
 
-        sum = 0;
         //PART 2
+        sum = 0;
         for (Long stone : stones) {
-            sum += test(stone, 0, 75, new HashMap<>());
-            
+            sum += recIterate(stone, 75, new HashMap<>()); 
         }
 
-        System.out.println(sum + "   |   Time: " + (System.currentTimeMillis() - time));
+        System.out.println(sum + "   |   Time: " + (System.currentTimeMillis() - time) + "ms");
 
     }
 
@@ -80,20 +74,27 @@ public class day11 {
         
     }
 
-    public long test(long value, int iteration, int max_iteration, Map<String, Long> mem){
-        if (mem.containsKey(value + "|" + iteration)) return mem.get(value + "|" + iteration);
-        long return_value = 0;
-        if      (iteration == max_iteration) return_value = 1;
-        else if (value == 0)                 return_value = test(1, iteration+1, max_iteration, mem);
-        else if (Long.toString(value).length() % 2 == 0) {
-                                             return_value = test(splitInHalf(value).get(0), iteration+1, max_iteration, mem);
-                                             return_value += test(splitInHalf(value).get(1), iteration+1, max_iteration, mem);
-        }
-        else                                 return_value = test(value * 2024, iteration+1, max_iteration, mem);
+    public long recIterate(long value, int iterations, Map<String, Long> mem){
+        long   return_value    = 0;
+        int    next_iterations = iterations - 1;
+        String memKey          = value + "|" + iterations;
 
-        mem.put(value + "|" + iteration, return_value);
+        if      (mem.containsKey(memKey)) return mem.get(memKey);
+        else if (iterations == 0)          return_value = 1;
+        else if (value == 0)              return_value = recIterate(1, next_iterations, mem);
+        else if (Long.toString(value).length() % 2 == 0) {
+            List<Long> split = splitInHalf(value);
+            return_value = recIterate(split.get(0), next_iterations, mem);
+            return_value += recIterate(split.get(1), next_iterations, mem);
+        }
+        else return_value = recIterate(value * 2024, next_iterations, mem);
+
+        mem.put(memKey, return_value);
         return return_value;
     }
+
+
+
 
     public List<Long> splitInHalf(long value){
         String asString = Long.toString(value);
